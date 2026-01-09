@@ -1,0 +1,270 @@
+* { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #f3f4f6;
+      overflow: hidden;
+      color: #111827;
+    }
+
+    .app {
+      height: 100vh;
+      display: grid;
+      grid-template-columns: 360px 1fr 420px;
+      grid-template-rows: 1fr 74px;
+      gap: 12px;
+      padding: 12px;
+      align-items: stretch;
+    }
+
+    .panel {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+      min-height: 0;
+    }
+
+    .panel.scroll {
+      overflow: auto;
+      max-height: calc(100vh - 12px - 74px - 12px);
+      padding-right: 10px;
+    }
+
+    .title {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 0 0 10px;
+    }
+
+    .center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 0;
+    }
+
+    canvas {
+      width: auto;
+      height: auto;
+      image-rendering: pixelated;
+      border: 1px solid #cfcfcf;
+      border-radius: 14px;
+      background: #000;
+    }
+
+    .control {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 6px 10px;
+      margin-bottom: 10px;
+      align-items: center;
+    }
+
+    .control label {
+      grid-column: 1 / -1;
+      font-size: 12px;
+      color: #374151;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: center;
+    }
+    .control label .hint { color: #6b7280; font-weight: 500; }
+
+    input[type="range"] { width: 100%; }
+    input[type="number"] {
+      width: 92px;
+      padding: 6px 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      font: inherit;
+      font-size: 12px;
+      background: #fff;
+    }
+
+
+    .bottom {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .seedbox {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 14px;
+      padding: 10px 12px;
+      min-width: min(860px, 100%);
+      justify-content: center;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03);
+      flex-wrap: wrap;
+    }
+    .seedbox label { font-size: 12px; color: #374151; }
+    .seedbox input[type="number"] { width: 140px; }
+
+    button {
+      border: 1px solid #d1d5db;
+      background: #fff;
+      border-radius: 12px;
+      padding: 9px 12px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 13px;
+    }
+    button:hover { background: #f9fafb; }
+
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: #374151;
+      margin-left: 8px;
+      user-select: none;
+    }
+    .toggle input { transform: translateY(1px); }
+
+    .legend-grid {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      font-size: 12px;
+    }
+    .legend-grid th, .legend-grid td {
+      border: 1px solid #d1d5db;
+      padding: 8px 6px;
+      text-align: center;
+    }
+    .legend-grid th {
+      background: #f3f4f6;
+      font-weight: 700;
+      color: #374151;
+    }
+    .legend-cell {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      min-height: 64px;
+      justify-content: center;
+    }
+    .swatch {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+      border: 1px solid rgba(0,0,0,0.2);
+    }
+
+    .small {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      font-size: 12px;
+      color: #374151;
+    }
+    .small .item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 8px 10px;
+      background: #fafafa;
+    }
+
+    .muted { color: #6b7280; font-size: 12px; margin-top: 10px; line-height: 1.35; }
+    .divider { height: 1px; background: #e5e7eb; margin: 12px 0; }
+
+    .row-btns { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+
+    @media (max-width: 1100px) {
+      body { overflow: auto; }
+      .app {
+        height: auto;
+        min-height: 100vh;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto auto auto;
+      }
+      .panel.scroll { max-height: none; }
+      .bottom { grid-column: 1 / 2; }
+    }
+
+    .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(2px);
+    z-index: 50;
+    }
+
+    .drawer {
+    position: fixed;
+    left: 50%;
+    transform: translateX(-50%) translateY(18px);
+    bottom: 0;
+    width: min(980px, calc(100vw - 24px));
+    max-height: min(70vh, 640px);
+    background: #fff;
+    border: 1px solid #ddd;
+    border-bottom: 0;
+    border-radius: 16px 16px 0 0;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.12);
+    z-index: 60;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease, transform .18s ease;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    }
+
+    .drawer.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+    }
+
+    .drawer-head {
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap: 12px;
+    padding: 12px 12px 10px;
+    border-bottom: 1px solid #eee;
+    background: #fafafa;
+    }
+
+    .drawer-sub {
+    font-size: 12px;
+    color: #666;
+    margin-top: 2px;
+    }
+
+    .drawer-actions {
+    display:flex;
+    gap: 8px;
+    align-items:center;
+    flex-wrap: wrap;
+    }
+
+    .slots {
+    padding: 12px;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+    }
+
+    @media (max-width: 900px) {
+    .slots { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }

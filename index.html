@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Генерация 2D ландшафта</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- LEFT -->
+    <aside class="panel">
+      <h3 class="title">Легенда биомов</h3>
+
+      <table class="legend-grid">
+        <tr>
+          <th></th>
+          <th>Холодно</th>
+          <th>Умеренно</th>
+          <th>Жарко</th>
+        </tr>
+        <tr>
+          <th>Сухо</th>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(190,190,150)"></div><div>Холодная степь</div></div></td>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(205,185,110)"></div><div>Пустыня</div></div></td>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(220,200,120)"></div><div>Жаркая пустыня</div></div></td>
+        </tr>
+        <tr>
+          <th>Нормально</th>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(70,120,80)"></div><div>Тайга</div></div></td>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(60,170,85)"></div><div>Лес</div></div></td>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(170,180,90)"></div><div>Саванна</div></div></td>
+        </tr>
+        <tr>
+          <th>Влажно</th>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(60,110,90)"></div><div>Влажная тайга</div></div></td>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(40,140,85)"></div><div>Дождевой лес</div></div></td>
+          <td><div class="legend-cell"><div class="swatch" style="background: rgb(25,130,55)"></div><div>Джунгли</div></div></td>
+        </tr>
+      </table>
+
+      <div class="small">
+        <div class="item"><div class="swatch" style="background: rgb(0,80,200)"></div><div>Вода</div></div>
+        <div class="item"><div class="swatch" style="background: rgb(220,210,140)"></div><div>Пляж</div></div>
+        <div class="item"><div class="swatch" style="background: rgb(140,140,140)"></div><div>Горы</div></div>
+        <div class="item"><div class="swatch" style="background: rgb(240,240,240)"></div><div>Снег</div></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <h3 class="title">Пороги рельефа</h3>
+
+      <div class="control">
+        <label>Порог пляжа <span class="hint" id="beachVal"></span></label>
+        <span></span>
+        <input id="beach" type="range" value="0.06" min="0" max="0.20" step="0.005" />
+        <input id="beachNum" type="number" value="0.06" min="0" max="0.20" step="0.005" />
+      </div>
+
+      <div class="control">
+        <label>Порог гор <span class="hint" id="rockVal"></span></label>
+        <span></span>
+        <input id="rock" type="range" value="0.45" min="0.30" max="0.85" step="0.01" />
+        <input id="rockNum" type="number" value="0.45" min="0.30" max="0.85" step="0.01" />
+      </div>
+
+      <div class="control">
+        <label>Порог снега <span class="hint" id="snowVal"></span></label>
+        <span></span>
+        <input id="snow" type="range" value="0.60" min="0.40" max="0.95" step="0.01" />
+        <input id="snowNum" type="number" value="0.60" min="0.40" max="0.95" step="0.01" />
+      </div>
+
+      <div class="row-btns">
+        <button id="btnReliefReset" type="button">Сбросить пороги</button>
+      </div>
+
+    </aside>
+
+    <!-- CENTER -->
+    <main class="center">
+      <canvas id="c" width="512" height="512"></canvas>
+    </main>
+
+    <!-- RIGHT -->
+    <aside class="panel scroll">
+      <h3 class="title">Настройки</h3>
+
+      <div class="control">
+        <label>Масштаб рельефа <span class="hint" id="scaleVal"></span></label>
+        <span></span>
+        <input id="scale" type="range" value="64" min="4" max="512" step="1" />
+        <input id="scaleNum" type="number" value="64" min="4" max="512" step="1" />
+      </div>
+
+      <!-- Sea -->
+      <div class="control" id="seaWrap">
+        <label>
+          Уровень моря <span class="hint" id="seaVal"></span>
+        </label>
+        <span></span>
+        <div class="disable-target" id="seaTarget" style="display:contents;">
+          <input id="sea" type="range" value="0.45" min="0" max="1" step="0.01" />
+          <input id="seaNum" type="number" value="0.45" min="0" max="1" step="0.01" />
+        </div>
+      </div>
+
+      <!-- Falloff -->
+      <div class="control" id="falloffWrap">
+        <label>
+          Маска (край карты) <span class="hint" id="falloffVal"></span>
+        </label>
+        <span></span>
+        <div class="disable-target" id="falloffTarget" style="display:contents;">
+          <input id="falloff" type="range" value="0.75" min="0" max="3" step="0.01" />
+          <input id="falloffNum" type="number" value="0.75" min="0" max="3" step="0.01" />
+        </div>
+      </div>
+
+
+      <!-- Moisture group -->
+      <div class="control" id="mWrap">
+        <label>
+          Влажность <span class="hint"></span>
+        </label>
+        <span></span>
+        <div></div>
+      </div>
+
+      <div class="control">
+        <label>Масштаб влажности<span class="hint" id="mScaleVal"></span></label>
+        <span></span>
+        <div class="disable-target" id="mScaleTarget" style="display:contents;">
+          <input id="mScale" type="range" value="180" min="20" max="600" step="1" />
+          <input id="mScaleNum" type="number" value="180" min="20" max="600" step="1" />
+        </div>
+      </div>
+
+      <div class="control">
+        <label>Контраст влажности <span class="hint" id="mStrVal"></span></label>
+        <span></span>
+        <div class="disable-target" id="mStrTarget" style="display:contents;">
+          <input id="mStr" type="range" value="1.1" min="0" max="2.5" step="0.01" />
+          <input id="mStrNum" type="number" value="1.1" min="0" max="2.5" step="0.01" />
+        </div>
+      </div>
+
+      <!-- Temp group -->
+      <div class="control" id="tWrap">
+        <label>Температура <span class="hint"></span></label>
+        <span></span>
+        <div></div>
+      </div>
+
+      <div class="control">
+        <label>Широтный градиент <span class="hint" id="tLatVal"></span></label>
+        <span></span>
+        <div class="disable-target" id="tLatTarget" style="display:contents;">
+          <input id="tLat" type="range" value="1.0" min="0" max="2.0" step="0.01" />
+          <input id="tLatNum" type="number" value="1.0" min="0" max="2.0" step="0.01" />
+        </div>
+      </div>
+
+      <div class="control">
+        <label>Падение температуры с высотой <span class="hint" id="tLapVal"></span></label>
+        <span></span>
+        <div class="disable-target" id="tLapTarget" style="display:contents;">
+          <input id="tLap" type="range" value="0.55" min="0" max="1.2" step="0.01" />
+          <input id="tLapNum" type="number" value="0.55" min="0" max="1.2" step="0.01" />
+        </div>
+      </div>
+
+      <details style="margin-top:12px;">
+        <summary style="cursor:pointer; color:#374151; font-weight:700;">Дополнительно</summary>
+        <div style="height:10px"></div>
+
+        <div class="control">
+          <label>Октавы <span class="hint" id="octavesVal"></span></label>
+          <span></span>
+          <input id="octaves" type="range" value="5" min="1" max="8" step="1" />
+          <input id="octavesNum" type="number" value="5" min="1" max="8" step="1" />
+        </div>
+
+        <div class="control">
+          <label>Убывание октав <span class="hint" id="persistenceVal"></span></label>
+          <span></span>
+          <input id="persistence" type="range" value="0.5" min="0" max="1.0" step="0.01" />
+          <input id="persistenceNum" type="number" value="0.5" min="0" max="1.0" step="0.01" />
+        </div>
+
+        <div class="control">
+          <label>Рост частоты <span class="hint" id="lacunarityVal"></span></label>
+          <span></span>
+          <input id="lacunarity" type="range" value="2.0" min="1.0" max="4.0" step="0.01" />
+          <input id="lacunarityNum" type="number" value="2.0" min="1.0" max="4.0" step="0.01" />
+        </div>
+
+        <div class="control">
+          <label>Направление света <span class="hint" id="lightAngVal"></span></label>
+          <span></span>
+          <input id="lightAng" type="range" value="315" min="0" max="360" step="1" />
+          <input id="lightAngNum" type="number" value="315" min="0" max="360" step="1" />
+        </div>
+
+        <div class="control">
+          <label>Сила теней <span class="hint" id="shadeVal"></span></label>
+          <span></span>
+          <input id="shade" type="range" value="1" min="0" max="1" step="0.01" />
+          <input id="shadeNum" type="number" value="1" min="0" max="1" step="0.01" />
+        </div>
+      </details>
+    </aside>
+
+    <!-- BOTTOM  -->
+    <div class="bottom">
+      <div class="seedbox">
+        <label for="seed">Сид</label>
+        <input id="seed" type="number" value="38" step="1" />
+        <button id="btnRand" type="button">🎲 Случайно</button>
+        <button id="openSaves" type="button" class="btn">💾 Сохранения</button>
+        <button id="btnSave" type="button">💾 Скачать PNG</button>
+        <button id="btnGen" type="button">⚙️ Сгенерировать</button>
+        <label class="toggle"><input id="realtime" type="checkbox" checked> Realtime рендер</label>
+    </div>
+    </div>
+
+  </div>
+
+<div id="savesOverlay" class="overlay" hidden></div>
+
+<aside id="savesDrawer" class="drawer" aria-hidden="true">
+  <div class="drawer-head">
+    <div>
+      <b>Сохранения</b>
+    </div>
+
+    <div class="drawer-actions">
+      <button id="saveAllClear" type="button" class="btn secondary">Очистить всё</button>
+      <button id="closeSaves" type="button" class="btn">Закрыть</button>
+    </div>
+  </div>
+
+  <div id="slots" class="slots"></div>
+</aside>
+
+<script src="script.js"></script>
+</body>
+</html>
